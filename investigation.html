@@ -8,14 +8,12 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>FCIS — Investigation</title>
 
-  <!-- Bootstrap Icons CDN (glyphs only — no Bootstrap layout/theme used) -->
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     crossorigin="anonymous"
   />
 
-  <!-- vis-network CDN -->
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/standalone/umd/vis-network.min.js"
     crossorigin="anonymous"
@@ -28,7 +26,13 @@
   <!-- ===================== NAVBAR ===================== -->
   <nav class="fcis-navbar">
     <a href="index.html" class="fcis-brand">
-      <div class="fcis-brand-icon">🔍</div>
+      <div class="fcis-brand-icon">
+        <!-- Magnifying glass -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+        </svg>
+      </div>
       <span class="fcis-brand-name">FCIS</span>
       <span class="fcis-brand-tag">v1.0</span>
     </a>
@@ -67,7 +71,6 @@
       </div>
     </div>
 
-    <!-- Graph fills the stage; every other panel overlays it -->
     <div class="inv-stage">
 
       <!-- ===================== GRAPH PANEL ===================== -->
@@ -79,18 +82,16 @@
             Transaction Network
           </div>
           <div class="graph-controls" role="group" aria-label="Graph controls">
-            <button class="graph-btn" id="graph-zoom-in"  title="Zoom in"      aria-label="Zoom in">+</button>
-            <button class="graph-btn" id="graph-zoom-out" title="Zoom out"     aria-label="Zoom out">−</button>
-            <button class="graph-btn" id="graph-fit"      title="Fit to view"  aria-label="Fit all nodes in view">
+            <button class="graph-btn" id="graph-zoom-in"  title="Zoom in"     aria-label="Zoom in">+</button>
+            <button class="graph-btn" id="graph-zoom-out" title="Zoom out"    aria-label="Zoom out">−</button>
+            <button class="graph-btn" id="graph-fit"      title="Fit to view" aria-label="Fit all nodes in view">
               <i class="bi bi-fullscreen" aria-hidden="true" style="font-size:11px;"></i>
             </button>
           </div>
         </div>
 
-        <!-- The vis-network mounts here -->
         <div id="network-graph" role="img" aria-label="Interactive money trail network graph"></div>
 
-        <!-- Legend -->
         <div class="graph-legend" aria-label="Risk level legend">
           <span class="legend-item">
             <span class="legend-dot" style="background:var(--critical);" aria-hidden="true"></span>
@@ -127,9 +128,14 @@
         </div>
 
         <div class="account-panel-body" id="account-details-body">
-          <!-- No selection state (default) -->
+          <!-- No selection state -->
           <div id="no-selection-state" class="no-selection-state">
-            <div class="no-selection-icon" aria-hidden="true">🖱️</div>
+            <div class="no-selection-icon" aria-hidden="true">
+              <!-- Cursor / pointer icon -->
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4l7.07 17 2.51-7.39L21 11.07z"/>
+              </svg>
+            </div>
             <p class="no-selection-text">
               Select an entity in the network to view ownership details, transaction volume, and case metadata.
             </p>
@@ -186,15 +192,19 @@
                 <th scope="col">Status</th>
               </tr>
             </thead>
-            <tbody id="tx-table-body">
-              <!-- Populated by app.js -->
-            </tbody>
+            <tbody id="tx-table-body"></tbody>
           </table>
         </div>
 
         <!-- Empty state -->
         <div id="tx-empty" class="empty-state" style="display:none;" aria-live="polite">
-          <div class="empty-state-icon" aria-hidden="true">📭</div>
+          <div class="empty-state-icon" aria-hidden="true">
+            <!-- Empty inbox / no mail icon -->
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </div>
           <p class="empty-state-text">No transaction activity recorded for this entity.</p>
         </div>
 
