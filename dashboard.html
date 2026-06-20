@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>FCIS — Dashboard</title>
+
+  <!-- Bootstrap 5 CDN (layout utilities only — visual theme fully overridden by style.css) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+
+  <!-- Bootstrap Icons CDN -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    crossorigin="anonymous"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="fcis-navbar">
+    <a href="index.html" class="fcis-brand">
+      <div class="fcis-brand-icon">🔍</div>
+      <span class="fcis-brand-name">FCIS</span>
+      <span class="fcis-brand-tag">v1.0</span>
+    </a>
+
+    <div class="fcis-nav-links">
+      <a href="index.html"         class="fcis-nav-link">Upload</a>
+      <a href="dashboard.html"     class="fcis-nav-link active">Dashboard</a>
+      <a href="investigation.html" class="fcis-nav-link">Investigation</a>
+    </div>
+
+    <span class="status-dot">SYSTEM ONLINE</span>
+  </nav>
+
+  <!-- ===================== ERROR BANNER ===================== -->
+  <div id="error-banner" class="error-banner mx-4 mt-4" role="alert" aria-live="assertive">
+    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+    <span class="error-msg"></span>
+  </div>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="dashboard-layout">
+
+    <!-- Page header -->
+    <div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div>
+        <h1 class="page-title">Risk Dashboard</h1>
+        <p class="page-subtitle">Case overview, ranked by threat severity across the active ledger</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="index.html" class="btn-fcis-ghost">
+          <i class="bi bi-upload" aria-hidden="true"></i>
+          New Upload
+        </a>
+        <a href="investigation.html" class="btn-fcis-primary">
+          <i class="bi bi-diagram-3" aria-hidden="true"></i>
+          Open Graph
+        </a>
+      </div>
+    </div>
+
+    <!-- ===================== STATS GRID ===================== -->
+    <section aria-label="Summary statistics">
+      <div class="stats-grid">
+
+        <!-- Total Transactions -->
+        <article class="stat-card stat-info" aria-label="Total Transactions">
+          <div class="stat-icon icon-info" aria-hidden="true">
+            <i class="bi bi-arrow-left-right"></i>
+          </div>
+          <div class="stat-value" id="stat-total-tx" aria-live="polite">
+            <span class="skeleton" style="width:90px;height:32px;display:inline-block;border-radius:4px;"></span>
+          </div>
+          <div class="stat-label">Total Transactions</div>
+        </article>
+
+        <!-- Total Accounts -->
+        <article class="stat-card stat-safe" aria-label="Total Accounts">
+          <div class="stat-icon icon-safe" aria-hidden="true">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="stat-value" id="stat-total-acc" aria-live="polite">
+            <span class="skeleton" style="width:70px;height:32px;display:inline-block;border-radius:4px;"></span>
+          </div>
+          <div class="stat-label">Total Accounts</div>
+        </article>
+
+        <!-- Suspicious Accounts -->
+        <article class="stat-card stat-warning" aria-label="Suspicious Accounts">
+          <div class="stat-icon icon-warning" aria-hidden="true">
+            <i class="bi bi-exclamation-diamond-fill"></i>
+          </div>
+          <div class="stat-value" id="stat-suspicious" aria-live="polite">
+            <span class="skeleton" style="width:50px;height:32px;display:inline-block;border-radius:4px;"></span>
+          </div>
+          <div class="stat-label">Suspicious Accounts</div>
+        </article>
+
+        <!-- Highest Risk Score -->
+        <article class="stat-card stat-danger threat-pulse" aria-label="Highest Risk Score">
+          <div class="stat-icon icon-danger" aria-hidden="true">
+            <i class="bi bi-shield-exclamation"></i>
+          </div>
+          <div class="stat-value" id="stat-highest-risk" style="color:var(--critical)" aria-live="polite">
+            <span class="skeleton" style="width:60px;height:32px;display:inline-block;border-radius:4px;"></span>
+          </div>
+          <div class="stat-label">Highest Risk Score</div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== RISK TABLE ===================== -->
+    <section aria-label="Risk score table">
+
+      <div class="table-toolbar">
+        <div class="section-title">Account Risk Scores</div>
+
+        <div class="d-flex gap-3 align-items-center flex-wrap">
+          <!-- Search -->
+          <div class="fcis-search" role="search">
+            <i class="bi bi-search fcis-search-icon" aria-hidden="true"></i>
+            <input
+              type="search"
+              id="account-search"
+              placeholder="Search account…"
+              aria-label="Search accounts by ID"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <!-- Sort controls -->
+          <div class="sort-controls" role="group" aria-label="Sort options">
+            <button class="sort-btn sort-active" data-sort="desc" aria-pressed="true">
+              <i class="bi bi-sort-down" aria-hidden="true"></i> High
+            </button>
+            <button class="sort-btn" data-sort="asc" aria-pressed="false">
+              <i class="bi bi-sort-up" aria-hidden="true"></i> Low
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="fcis-card" style="padding:0; overflow:hidden;">
+        <div class="fcis-table-wrapper">
+          <table class="fcis-table" role="table" aria-label="Account risk scores">
+            <thead>
+              <tr>
+                <th scope="col" style="width:48px;">#</th>
+                <th scope="col">Account ID</th>
+                <th scope="col">Risk Score</th>
+              </tr>
+            </thead>
+            <tbody id="risk-table-body">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state -->
+        <div id="table-empty" class="empty-state" style="display:none;" aria-live="polite">
+          <div class="empty-state-icon" aria-hidden="true">🔍</div>
+          <p class="empty-state-text">No accounts match this query.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="fcis-footer">
+    <span class="fcis-footer-text">FCIS &copy; 2025 &mdash; Financial Crime Investigation System</span>
+    <span class="fcis-footer-text">
+      <kbd class="kbd">Click a row</kbd> to open investigation
+    </span>
+  </footer>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite" aria-label="Loading dashboard data">
+    <div class="loading-card">
+      <div class="loading-spinner-lg" aria-hidden="true"></div>
+      <p class="loading-label">Fetching analysis results…</p>
+      <p class="loading-sub">GET /api/dashboard &amp; /api/risk-scores</p>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS bundle -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmWBjstz8T8AlGkgqamFxlYEMJF8"
+    crossorigin="anonymous"
+  ></script>
+  <script src="app.js"></script>
+</body>
+</html>

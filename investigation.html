@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>FCIS — Investigation</title>
+
+  <!-- Bootstrap Icons CDN (glyphs only — no Bootstrap layout/theme used) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    crossorigin="anonymous"
+  />
+
+  <!-- vis-network CDN -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/standalone/umd/vis-network.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="fcis-navbar">
+    <a href="index.html" class="fcis-brand">
+      <div class="fcis-brand-icon">🔍</div>
+      <span class="fcis-brand-name">FCIS</span>
+      <span class="fcis-brand-tag">v1.0</span>
+    </a>
+
+    <div class="fcis-nav-links">
+      <a href="index.html"         class="fcis-nav-link">Upload</a>
+      <a href="dashboard.html"     class="fcis-nav-link">Dashboard</a>
+      <a href="investigation.html" class="fcis-nav-link active">Investigation</a>
+    </div>
+
+    <span class="status-dot">SYSTEM ONLINE</span>
+  </nav>
+
+  <!-- Error banner -->
+  <div id="error-banner" class="error-banner mx-4 mt-4" role="alert" aria-live="assertive">
+    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+    <span class="error-msg"></span>
+  </div>
+
+  <div class="investigation-wrapper">
+
+    <!-- Top bar -->
+    <div class="inv-top-bar">
+      <div>
+        <h1 class="page-title" style="font-size:17px;">
+          Money Trail Investigation
+          <span id="page-account-label" style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);margin-left:8px;"></span>
+        </h1>
+        <p class="page-subtitle">Select an entity to trace fund flow and load the case file</p>
+      </div>
+      <div class="d-flex gap-2 align-center">
+        <span id="selected-risk-badge" class="fcis-badge" aria-live="polite"></span>
+        <a href="dashboard.html" class="btn-fcis-ghost">
+          <i class="bi bi-arrow-left" aria-hidden="true"></i> Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Graph fills the stage; every other panel overlays it -->
+    <div class="inv-stage">
+
+      <!-- ===================== GRAPH PANEL ===================== -->
+      <section class="graph-panel" aria-label="Transaction network graph">
+
+        <div class="graph-header">
+          <div class="graph-title">
+            <i class="bi bi-diagram-3-fill" aria-hidden="true" style="color:var(--accent)"></i>
+            Transaction Network
+          </div>
+          <div class="graph-controls" role="group" aria-label="Graph controls">
+            <button class="graph-btn" id="graph-zoom-in"  title="Zoom in"      aria-label="Zoom in">+</button>
+            <button class="graph-btn" id="graph-zoom-out" title="Zoom out"     aria-label="Zoom out">−</button>
+            <button class="graph-btn" id="graph-fit"      title="Fit to view"  aria-label="Fit all nodes in view">
+              <i class="bi bi-fullscreen" aria-hidden="true" style="font-size:11px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- The vis-network mounts here -->
+        <div id="network-graph" role="img" aria-label="Interactive money trail network graph"></div>
+
+        <!-- Legend -->
+        <div class="graph-legend" aria-label="Risk level legend">
+          <span class="legend-item">
+            <span class="legend-dot" style="background:var(--critical);" aria-hidden="true"></span>
+            Critical ≥80
+          </span>
+          <span class="legend-item">
+            <span class="legend-dot" style="background:var(--high);" aria-hidden="true"></span>
+            High 60–79
+          </span>
+          <span class="legend-item">
+            <span class="legend-dot" style="background:var(--medium);" aria-hidden="true"></span>
+            Medium 40–59
+          </span>
+          <span class="legend-item">
+            <span class="legend-dot" style="background:var(--low);" aria-hidden="true"></span>
+            Low &lt;40
+          </span>
+          <span class="legend-item" style="margin-left:auto;">
+            <kbd class="kbd">Scroll</kbd> zoom &nbsp;
+            <kbd class="kbd">Drag</kbd> pan
+          </span>
+        </div>
+      </section>
+
+      <!-- ===================== ACCOUNT DETAILS DRAWER ===================== -->
+      <aside class="account-panel inv-drawer" aria-label="Account details">
+
+        <div class="account-panel-header">
+          <div class="account-panel-title">
+            <i class="bi bi-person-badge-fill" aria-hidden="true" style="color:var(--accent);margin-right:6px;"></i>
+            Entity Details
+          </div>
+          <span id="selected-account-id" class="fcis-badge badge-medium" aria-live="polite">—</span>
+        </div>
+
+        <div class="account-panel-body" id="account-details-body">
+          <!-- No selection state (default) -->
+          <div id="no-selection-state" class="no-selection-state">
+            <div class="no-selection-icon" aria-hidden="true">🖱️</div>
+            <p class="no-selection-text">
+              Select an entity in the network to view ownership details, transaction volume, and case metadata.
+            </p>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ===================== AI REPORT DRAWER ===================== -->
+      <section class="report-panel inv-drawer" aria-label="AI investigation report">
+
+        <div class="report-panel-header">
+          <div class="d-flex align-center gap-2">
+            <i class="bi bi-robot" aria-hidden="true" style="color:var(--critical);"></i>
+            <span class="report-panel-title">Investigation Report</span>
+          </div>
+          <span class="ai-badge">AI</span>
+        </div>
+
+        <div class="report-panel-body">
+          <p
+            id="report-placeholder"
+            class="report-placeholder"
+            aria-live="polite"
+          >
+            <i class="bi bi-cursor-text" aria-hidden="true"></i>
+            Select an entity to generate its investigation report.
+          </p>
+          <p id="ai-report-text" class="report-text" aria-live="polite" style="white-space:pre-line;"></p>
+        </div>
+
+      </section>
+
+      <!-- ===================== TRANSACTION HISTORY DRAWER ===================== -->
+      <section class="tx-panel inv-drawer" aria-label="Transaction history table">
+
+        <div class="tx-header">
+          <div class="d-flex align-center gap-2">
+            <i class="bi bi-clock-history" aria-hidden="true" style="color:var(--high);"></i>
+            <span class="section-title" style="font-size:12px;">Transaction History</span>
+          </div>
+          <span class="fcis-badge badge-medium" id="tx-count-badge" aria-live="polite"></span>
+        </div>
+
+        <div class="fcis-table-wrapper">
+          <table class="fcis-table" role="table" aria-label="Transaction records">
+            <thead>
+              <tr>
+                <th scope="col">Tx ID</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state -->
+        <div id="tx-empty" class="empty-state" style="display:none;" aria-live="polite">
+          <div class="empty-state-icon" aria-hidden="true">📭</div>
+          <p class="empty-state-text">No transaction activity recorded for this entity.</p>
+        </div>
+
+      </section>
+
+    </div><!-- / .inv-stage -->
+  </div><!-- / .investigation-wrapper -->
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite" aria-label="Loading investigation data">
+    <div class="loading-card">
+      <div class="loading-spinner-lg" aria-hidden="true"></div>
+      <p class="loading-label">Building money trail graph…</p>
+      <p class="loading-sub">GET /api/graph → vis-network render</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
