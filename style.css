@@ -1,10 +1,4 @@
-/* ============================================================
-   FCIS — Financial Crime Investigation System
-   style.css
-   Design system: investigative terminal — quiet, dense, evidentiary
-   ============================================================ */
 
-/* --- Typeface --- */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ============================================================
@@ -53,7 +47,7 @@
   /* Type */
   --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body:    'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+  --font-mono:    'Space Grotesk', 'Courier New', monospace;
 
   /* Radii — fixed system, no other values permitted */
   --radius-sm: 8px;   /* badges / chips */
@@ -121,7 +115,8 @@ h1, h2, h3, h4, h5, h6 {
    NAVBAR
    ============================================================ */
 .fcis-navbar {
-  background: rgba(15, 17, 21, 0.96);
+  /* background: rgba(15, 17, 21, 0.96); */
+  background: transparent;
   border-bottom: 1px solid var(--border-subtle);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -138,13 +133,13 @@ h1, h2, h3, h4, h5, h6 {
 .fcis-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   text-decoration: none;
 }
 
 .fcis-brand-icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   background: var(--bg-panel-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
@@ -248,7 +243,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Stat cards */
 .stat-card {
-  background: var(--bg-panel);
+  background:linear-gradient(#212736 , #191f37) ;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 20px 22px;
@@ -536,8 +531,9 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   padding: 60px 24px;
-  background:
-    radial-gradient(ellipse 900px 500px at 50% 0%, rgba(91,124,153,0.05) 0%, transparent 60%);
+  /* background:
+    radial-gradient(ellipse 900px 500px at 50% 0%, rgba(91,124,153,0.05) 0%, transparent 60%); */
+    background: linear-gradient(#1f2737, #1e1d24);
 }
 
 .upload-hero-inner { width: 100%; max-width: 560px; }
@@ -582,7 +578,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Drop zone */
 .drop-zone {
-  background: var(--bg-panel);
+  background: #d4e0eb;
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-xl);
   padding: 44px 32px;
@@ -593,7 +589,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .drop-zone:hover,
-.drop-zone.drag-over { border-color: var(--accent); background: var(--bg-panel-raised); }
+.drop-zone.drag-over { border-color: var(--accent); background: #a9a8da; }
 .drop-zone.drag-over { border-style: solid; }
 .drop-zone.has-file  { border-color: var(--low); border-style: solid; background: var(--low-wash); }
 .drop-zone.error-state { border-color: var(--critical); border-style: solid; background: var(--critical-wash); }
@@ -608,9 +604,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .drop-zone:hover .drop-icon { transform: translateY(-2px); }
 
-.drop-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.drop-title { font-size: 15px; font-weight: 600; margin-bottom: 6px;color: #11141A; }
 
-.drop-hint { font-size: 12px; color: var(--text-tertiary); font-family: var(--font-mono); }
+.drop-hint { font-size: 12px; color: #11141A; font-family: var(--font-mono); }
 
 .drop-browse {
   color: var(--accent);
@@ -671,10 +667,10 @@ h1, h2, h3, h4, h5, h6 {
 .upload-actions { margin-top: 20px; display: flex; gap: 12px; align-items: center; }
 
 /* Feature pills */
-.feature-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+.feature-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
 
 .feature-pill {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
   background: var(--bg-panel);
@@ -683,17 +679,17 @@ h1, h2, h3, h4, h5, h6 {
   padding: 5px 11px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
   transition: border-color var(--motion-fast), color var(--motion-fast);
 }
 
-.feature-pill:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.feature-pill:hover { border-color: var(--border-strong); color: #0F1115; background: #6E91AC; }
 .feature-pill span { font-size: 10px; }
 
 /* ============================================================
    DASHBOARD PAGE
    ============================================================ */
-.dashboard-layout { padding: 26px 28px; max-width: 1400px; margin: 0 auto; }
+.dashboard-layout { padding: 26px 28px; max-width: 1400px; margin: 0 auto; background: linear-gradient(#1f2737, #1e1d24); }
 
 .page-header { margin-bottom: 26px; }
 
@@ -786,6 +782,7 @@ body:has(.investigation-wrapper) { overflow-x: hidden; }
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(#1f2737, #1e1d24);
 }
 
 .inv-top-bar {
@@ -894,6 +891,7 @@ body:has(.investigation-wrapper) { overflow-x: hidden; }
   max-height: calc(50% - 24px);
   display: flex;
   flex-direction: column;
+  background: #1F2430; 
 }
 
 /* Transaction history — bottom drawer spanning the stage, collapsed by default */
@@ -904,6 +902,7 @@ body:has(.investigation-wrapper) { overflow-x: hidden; }
   max-height: 280px;
   display: flex;
   flex-direction: column;
+  background: #1F2430;
 }
 
 @media (max-width: 1280px) {
@@ -992,10 +991,12 @@ body:has(.investigation-wrapper) { overflow-x: hidden; }
   font-weight: 700;
   color: var(--critical);
   background: var(--critical-wash);
+  
   border: 1px solid var(--critical-border);
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   letter-spacing: 0.08em;
+  
 }
 
 .report-panel-body { padding: 16px 18px; overflow-y: auto; flex: 1; }

@@ -1,16 +1,4 @@
-/**
- * FCIS — Financial Crime Investigation System
- * app.js — Shared utilities, API layer, and page-specific logic
- *
- * Security notes:
- *  - All dynamic content injected via textContent / safe DOM APIs
- *  - No innerHTML with user/API data
- *  - File-type validation before any submission
- *  - Defensive null/undefined guards throughout
- *  - XSS protection: createTextNode / textContent only
- *  - No inline event handlers in HTML
- *  - fetch() wrapped with timeout + error handling
- */
+
 
 'use strict';
 
@@ -222,12 +210,15 @@ function riskLabel(score) {
  * @returns {string}
  */
 function formatCurrency(n) {
-  if (typeof n !== 'number' || Number.isNaN(n)) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style:    'currency',
-    currency: 'USD',
+  const num = Number(n);
+
+  if (Number.isNaN(num)) return '—';
+
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
     maximumFractionDigits: 0,
-  }).format(n);
+  }).format(num);
 }
 
 /**
@@ -430,42 +421,78 @@ function initUploadPage() {
 
   /* --- Upload --- */
   uploadBtn.addEventListener('click', async () => {
-    if (!selectedFile) return;
+  if (!selectedFile) return;
 
-    // Re-validate before sending
-    const err = validateFile(selectedFile);
-    if (err) { showStatus('error', '⚠', err); return; }
+  const err = validateFile(selectedFile);
+  if (err) {
+    showStatus('error', '⚠', err);
+    return;
+  }
 
-    uploadBtn.disabled = true;
-    toggleVisible(spinnerEl, true, 'd-flex');
-    showStatus('loading', '', 'Parsing ledger and scoring risk — please wait.');
+  uploadBtn.disabled = true;
+  toggleVisible(spinnerEl, true, 'd-flex');
 
-    // Replace status icon with spinner for loading state
-    statusIcon.className = 'spinner';
-    statusIcon.textContent = '';
+  showStatus(
+    'loading',
+    '',
+    'Parsing ledger and scoring risk — please wait.'
+  );
 
-    try {
-      const result = await SimAPI.uploadCSV(selectedFile);
+  statusIcon.className = 'spinner';
+  statusIcon.textContent = '';
 
-      if (result?.success) {
-        showStatus('success', '✓',
-          `Risk analysis complete — Job ${result.jobId ?? '—'}. Redirecting to dashboard…`);
-        statusIcon.className = '';
+  try {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
 
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 1800);
-      } else {
-        throw new Error('Upload failed — server returned unsuccessful response.');
+    const response = await fetch(
+      "http://localhost:5000/upload",
+      {
+        method: "POST",
+        body: formData
       }
-    } catch (err) {
+    );
+
+    const result = await response.json();
+
+    localStorage.setItem(
+      "analysisData",
+      JSON.stringify(result)
+    );
+
+    if (result.success) {
       statusIcon.className = '';
-      showStatus('error', '⚠', err.message || 'Upload failed. Please try again.');
-      uploadBtn.disabled = false;
-    } finally {
-      spinnerEl.style.display = 'none';
+
+      showStatus(
+        'success',
+        '✓',
+        'Risk analysis complete — Redirecting to dashboard.'
+      );
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1500);
+
+    } else {
+      throw new Error(result.error || 'Upload failed');
     }
-  });
+
+  } catch (err) {
+
+    statusIcon.className = '';
+
+    showStatus(
+      'error',
+      '⚠',
+      err.message || 'Upload failed'
+    );
+
+    uploadBtn.disabled = false;
+
+  } finally {
+    spinnerEl.style.display = 'none';
+  }
+});
 
   /* --- Reset on double-click --- */
   dropZone.addEventListener('dblclick', clearSelection);
@@ -490,7 +517,11 @@ function initDashboardPage() {
   /* --- Load stats --- */
   async function loadStats() {
     try {
-      const data = await SimAPI.getDashboard();
+      const analysis = JSON.parse(
+  localStorage.getItem("analysisData")
+);
+
+const data = analysis.summary;
 
       safeText(document.getElementById('stat-total-tx'),       formatNumber(data.totalTransactions));
       safeText(document.getElementById('stat-total-acc'),      formatNumber(data.totalAccounts));
@@ -510,7 +541,11 @@ function initDashboardPage() {
     showSkeletonRows(tbody, 6);
 
     try {
-      const scores = await SimAPI.getRiskScores();
+      const analysis = JSON.parse(
+  localStorage.getItem("analysisData")
+);
+
+const scores = analysis.riskData;
       allRiskScores = Array.isArray(scores) ? scores : [];
       renderTable();
     } catch (err) {
@@ -645,6 +680,55 @@ function initInvestigationPage() {
   const accountIdEl    = document.getElementById('selected-account-id');
   const riskBadgeEl    = document.getElementById('selected-risk-badge');
   const reportTextEl   = document.getElementById('ai-report-text');
+  const reportBtn =
+  document.getElementById("generate-report");
+
+reportBtn?.addEventListener(
+  "click",
+  async () => {
+
+    reportTextEl.textContent =
+      "Generating AI report...";
+
+    const analysis =
+      JSON.parse(
+        localStorage.getItem("analysisData")
+      );
+
+    try {
+
+      const response =
+        await fetch(
+          "http://localhost:5000/report",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              summary: analysis.summary,
+              riskData: analysis.riskData,
+              graph: analysis.graph
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      reportTextEl.textContent =
+        data.report;
+
+    } catch (err) {
+
+      reportTextEl.textContent =
+        "Failed to generate report.";
+
+      console.error(err);
+    }
+  }
+);
   const reportPlacEl   = document.getElementById('report-placeholder');
   const noSelectionEl  = document.getElementById('no-selection-state');
   const detailsBodyEl  = document.getElementById('account-details-body');
@@ -684,7 +768,11 @@ function initInvestigationPage() {
   /* --- Load & render graph --- */
   async function loadGraph() {
     try {
-      const data = await SimAPI.getGraph();
+      const analysis = JSON.parse(
+  localStorage.getItem("analysisData")
+);
+
+const data = analysis.graph;
 
       if (!data || !Array.isArray(data.nodes) || !Array.isArray(data.edges)) {
         throw new Error('Invalid graph data received from server.');
@@ -897,12 +985,24 @@ function initInvestigationPage() {
     }
   }
 
+  const analysis = JSON.parse(
+  localStorage.getItem("analysisData")
+);
+
+const REAL_TRANSACTIONS =
+  analysis.transactions || [];
+
   /* --- Transaction table --- */
   function filterTransactions(accountId) {
     if (!txTbodyEl) return;
     const filtered = accountId
-      ? DUMMY.transactions.filter(t => t.from === accountId || t.to === accountId)
-      : DUMMY.transactions;
+  ? REAL_TRANSACTIONS.filter(t =>
+  t.from === accountId ||
+  t.to === accountId ||
+  t.sender === accountId ||
+  t.receiver === accountId
+)
+  : REAL_TRANSACTIONS;
     renderTransactions(filtered);
   }
 
@@ -921,10 +1021,18 @@ function initInvestigationPage() {
       const row = txTbodyEl.insertRow();
 
       const cells = [
-        { val: tx.id     ?? '—', cls: 'mono-cell' },
-        { val: tx.from   ?? '—', cls: 'mono-cell' },
-        { val: tx.to     ?? '—', cls: 'mono-cell' },
-        { val: typeof tx.amount === 'number' ? formatCurrency(tx.amount) : '—', cls: 'mono-cell' },
+        {
+  val: tx.id ?? `TXN-${String(list.indexOf(tx) + 1).padStart(3,'0')}`,
+  cls: 'mono-cell'
+},
+{ val: tx.from ?? tx.sender ?? '—', cls: 'mono-cell' },
+{ val: tx.to ?? tx.receiver ?? '—', cls: 'mono-cell' },
+        {
+  val: tx.amount
+    ? formatCurrency(Number(tx.amount))
+    : '—',
+  cls: 'mono-cell'
+},
         { val: tx.date   ?? '—', cls: 'mono-cell' },
         { val: null,             cls: '' }, // status badge — built separately
       ];
@@ -952,7 +1060,7 @@ function initInvestigationPage() {
   (async () => {
     toggleVisible(loadingOverlay, true);
 
-    renderTransactions(DUMMY.transactions);
+    renderTransactions(REAL_TRANSACTIONS);
     resetDetailsPanel();
 
     await loadGraph();
@@ -981,3 +1089,6 @@ function route() {
 }
 
 document.addEventListener('DOMContentLoaded', route);
+
+
+

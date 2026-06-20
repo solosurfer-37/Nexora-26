@@ -34,7 +34,7 @@
         </svg>
       </div>
       <span class="fcis-brand-name">FCIS</span>
-      <span class="fcis-brand-tag">v1.0</span>
+      
     </a>
 
     <div class="fcis-nav-links">
@@ -116,8 +116,8 @@
         </div>
       </section>
 
-      <!-- ===================== ACCOUNT DETAILS DRAWER ===================== -->
-      <aside class="account-panel inv-drawer" aria-label="Account details">
+
+      <!-- <aside class="account-panel inv-drawer" aria-label="Account details">
 
         <div class="account-panel-header">
           <div class="account-panel-title">
@@ -128,10 +128,10 @@
         </div>
 
         <div class="account-panel-body" id="account-details-body">
-          <!-- No selection state -->
+          
           <div id="no-selection-state" class="no-selection-state">
             <div class="no-selection-icon" aria-hidden="true">
-              <!-- Cursor / pointer icon -->
+              
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4l7.07 17 2.51-7.39L21 11.07z"/>
               </svg>
@@ -142,7 +142,7 @@
           </div>
         </div>
 
-      </aside>
+      </aside> -->
 
       <!-- ===================== AI REPORT DRAWER ===================== -->
       <section class="report-panel inv-drawer" aria-label="AI investigation report">
@@ -156,14 +156,13 @@
         </div>
 
         <div class="report-panel-body">
-          <p
-            id="report-placeholder"
-            class="report-placeholder"
-            aria-live="polite"
-          >
-            <i class="bi bi-cursor-text" aria-hidden="true"></i>
-            Select an entity to generate its investigation report.
-          </p>
+          <button
+  id="generate-report"
+  class="btn-fcis-primary"
+  style="margin-top:12px;"
+>
+  Generate AI Report
+</button>
           <p id="ai-report-text" class="report-text" aria-live="polite" style="white-space:pre-line;"></p>
         </div>
 
@@ -221,6 +220,13 @@
       <p class="loading-sub">GET /api/graph → vis-network render</p>
     </div>
   </div>
+
+  <footer class="fcis-footer">
+    <span class="fcis-footer-text">FCIS &copy; 2025 &mdash; FinLens</span>
+    <span class="fcis-footer-text">
+      <span class="fcis-footer-text">Team : Patiala Pegs</span>
+    </span>
+  </footer>
 
   <script src="app.js"></script>
 </body>
